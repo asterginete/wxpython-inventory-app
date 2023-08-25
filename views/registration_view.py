@@ -1,9 +1,10 @@
 import wx
 import os
+from db.db_utils import connect_to_db
 
 class RegistrationFrame(wx.Frame):
     def __init__(self, parent, title):
-        super(RegistrationFrame, self).__init__(parent, title=title, size=(400, 300))
+        super(RegistrationFrame, self).__init__(parent, title=title, size=(500, 400))
         
         panel = wx.Panel(self)
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -11,7 +12,7 @@ class RegistrationFrame(wx.Frame):
         # Fields
         self.name_ctrl = wx.TextCtrl(panel)
         self.price_ctrl = wx.TextCtrl(panel)
-        self.desc_ctrl = wx.TextCtrl(panel)
+        self.desc_ctrl = wx.TextCtrl(panel, style=wx.TE_MULTILINE)
         self.image_ctrl = wx.FilePickerCtrl(panel, path=os.getcwd(), wildcard="Image files (*.jpg;*.png)|*.jpg;*.png")
         
         # Add to sizer
@@ -30,7 +31,7 @@ class RegistrationFrame(wx.Frame):
         vbox.Add(submit_btn, flag=wx.ALIGN_CENTER | wx.TOP, border=10)
         
         panel.SetSizer(vbox)
-        
+
     def on_submit(self, event):
         # Get values
         item_name = self.name_ctrl.GetValue()
@@ -45,3 +46,17 @@ class RegistrationFrame(wx.Frame):
                        (item_name, price, description, image_link))
         connection.commit()
         connection.close()
+
+        # Clear fields for next entry
+        self.name_ctrl.SetValue("")
+        self.price_ctrl.SetValue("")
+        self.desc_ctrl.SetValue("")
+        self.image_ctrl.SetPath("")
+
+        wx.MessageBox("Item registered successfully!", "Success", wx.OK | wx.ICON_INFORMATION)
+
+if __name__ == "__main__":
+    app = wx.App(False)
+    frame = RegistrationFrame(None, "Item Registration")
+    frame.Show()
+    app.MainLoop()
